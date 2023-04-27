@@ -1,1 +1,1 @@
-#init project
+#init project for US7
