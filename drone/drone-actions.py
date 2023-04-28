@@ -1,4 +1,3 @@
-import asyncio
 from tkinter import *
 from turtle import home
 from async_tkinter_loop import async_handler, async_mainloop
@@ -120,7 +119,7 @@ async def goto_coordonnates_close(drone, coordinates):
     finish = True
     while (float(await get_battery(drone)) > 0.1 and not stop_drone):
         printPxh(f"stop_drone: {stop_drone}")
-        printPxh("finish: " + str(finish))
+        printPxh(f"finish: {finish}")
         if finish:
             finish = False
             await goto_coordinates(drone, coordinates)
@@ -135,13 +134,12 @@ async def go_to_coordinates_open(drone, coordinates):
     global finish
     global reversed
     reverse_coordinates = coordinates[::-1]
-    printPxh("reverse_coordinates: " + str(reverse_coordinates))
     reversed = False
     if not connected:
         await setup(drone)
     finish = True
     while (float(await get_battery(drone)) > 0.1 and not stop_drone):
-        printPxh("finish: " + str(finish))
+        printPxh(f"finish: {finish}")
         if finish:
             if reversed:
                 reversed = False
@@ -159,7 +157,7 @@ async def get_battery(drone):
     """
     printPxh("-- Getting battery level")
     async for battery in drone.telemetry.battery():
-        printPxh("-- Battery level: " + str(battery.remaining_percent))
+        printPxh(f"-- Battery: {battery.remaining_percent}")
         return battery.remaining_percent
 
 
@@ -167,7 +165,9 @@ async def return_to_home(drone):
     """
     Returns the drone to the takeOff position.
     """
+    printPxh("-- Returning to home")
     await drone.action.return_to_launch()
+    printPxh("-- arrived at home")
 
 
 def printPxh(message=""):
