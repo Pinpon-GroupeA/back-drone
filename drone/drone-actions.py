@@ -102,7 +102,6 @@ async def goto_coordinates(drone,coordinates, close=False):
     printPxh("-- Starting mission")
     await drone.mission.start_mission()
 
-    #printPxh("-- Arrived at: " + str(lat)  + ", " + str(long))
     
 
 def printPxh(msg=""):
