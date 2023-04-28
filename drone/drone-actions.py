@@ -74,7 +74,7 @@ async def goto_position(drone, alt, lat, long):
     printPxh(f"-- Arrived at: {lat}, {long}")
 
 
-async def goto_coordinates(drone, coordinates, close=False):
+async def goto_coordinates(drone, coordinates):
     """
     Moves the drone to the specified coordinates.
     :param coordinates: List of dictionaries containing the latitude, longitude, and altitude of the coordinates.
@@ -100,8 +100,6 @@ async def goto_coordinates(drone, coordinates, close=False):
                                          float('nan'),
                                          float('nan'),
                                          float('nan')))
-    if not close:
-        await drone.mission.set_return_to_launch_after_mission(True)
     mission_plan = MissionPlan(mission_items)
     printPxh("-- Uploading mission")
     await drone.mission.upload_mission(mission_plan)
