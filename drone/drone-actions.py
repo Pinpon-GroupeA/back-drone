@@ -5,15 +5,19 @@ from async_tkinter_loop import async_handler, async_mainloop
 from mavsdk import *
 from mavsdk.offboard import (OffboardError, PositionNedYaw)
 from mavsdk.mission import (MissionItem, MissionPlan)
-from mavsdk.camera import (CameraError, Mode,PhotosRange)
+from mavsdk.camera import (CameraError, Mode, PhotosRange)
 import time
 import webbrowser
 
-lastPacketTime=time.time()-10
+lastPacketTime = time.time()-10
+
+
 def hyperLink(url):
     webbrowser.open_new(url)
 
+
 connected = False
+
 
 async def setup(drone):
     """
@@ -22,7 +26,7 @@ async def setup(drone):
     """
     printPxh("Connecting to drone...")
     portIn = 14540
-    await drone.connect(system_address="udp://:"+ str(portIn))
+    await drone.connect(system_address="udp://:" + str(portIn))
 
     printPxh("Waiting for drone to connect...")
     global state
@@ -30,16 +34,17 @@ async def setup(drone):
     global health
 
     async for state in drone.core.connection_state():
-        lastPacketTime=time.time()
+        lastPacketTime = time.time()
         if state.is_connected:
             printPxh(f"-- Connected to drone!")
             printPxh(f"-- Connected int port: {portIn}")
             connected = True
             break
 
-    printPxh("Waiting for drone to have a global position estimate...")    
+    printPxh("Waiting for drone to have a global position estimate...")
 
-async def takeoff(drone,alt):
+
+async def takeoff(drone, alt):
     """
     Arms the drone and takes off to the specified altitude.
     :param alt: Altitude in meters
@@ -50,7 +55,8 @@ async def takeoff(drone,alt):
     await drone.action.set_takeoff_altitude(alt)
     await drone.action.takeoff()
 
-async def goto_position(drone,alt,lat,long):
+
+async def goto_position(drone, alt, lat, long):
     """
     Arms the drone and takes off to the specified altitude.
     :param alt: Altitude in meters
@@ -60,14 +66,15 @@ async def goto_position(drone,alt,lat,long):
 
     if not connected:
         await setup(drone)
-    printPxh("-- Going to: " + str(lat) + ", " + str(long) + " at " + str(alt) + "m")
+    printPxh(f"-- Going to: {lat}, {long} at {alt}m")
     await drone.action.set_takeoff_altitude(alt)
     await drone.action.arm()
     await drone.action.takeoff()
     await drone.action.goto_location(float(lat), float(long), alt, 0)
-    printPxh("-- Arrived at: " + str(lat)  + ", " + str(long))
+    printPxh(f"-- Arrived at: {lat}, {long}")
 
-async def goto_coordinates(drone,coordinates, close=False):
+
+async def goto_coordinates(drone, coordinates, close=False):
     """
     Moves the drone to the specified coordinates.
     :param coordinates: List of dictionaries containing the latitude, longitude, and altitude of the coordinates.
@@ -81,18 +88,18 @@ async def goto_coordinates(drone,coordinates, close=False):
         lat = coordinate["latitude"]
 
         mission_items.append(MissionItem(lat,
-                                     long,
-                                     alt,
-                                     10,
-                                     True,
-                                     float('nan'),
-                                     float('nan'),
-                                     MissionItem.CameraAction.TAKE_PHOTO,
-                                     float('nan'),
-                                     float('nan'),
-                                     float('nan'),
-                                     float('nan'),
-                                     float('nan')))
+                                         long,
+                                         alt,
+                                         10,
+                                         True,
+                                         float('nan'),
+                                         float('nan'),
+                                         MissionItem.CameraAction.TAKE_PHOTO,
+                                         float('nan'),
+                                         float('nan'),
+                                         float('nan'),
+                                         float('nan'),
+                                         float('nan')))
     if not close:
         await drone.mission.set_return_to_launch_after_mission(True)
     mission_plan = MissionPlan(mission_items)
@@ -102,9 +109,13 @@ async def goto_coordinates(drone,coordinates, close=False):
     printPxh("-- Starting mission")
     await drone.mission.start_mission()
 
-    
 
-def printPxh(msg=""):
-    print(msg)
+async def return_to_home(drone):
+    """
+    Returns the drone to the takeOff position.
+    """
+    await drone.action.return_to_launch()
 
 
+def printPxh(message=""):
+    print(message)
