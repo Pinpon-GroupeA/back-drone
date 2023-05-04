@@ -1,7 +1,6 @@
 import asyncio
 import json
 from supabase import create_client, Client
-import time
 from mavsdk import System
 from drone_actions import get_battery, get_postion, return_to_home, goto_coordonnates_close, go_to_coordinates_open
 
