@@ -34,6 +34,7 @@ async def setup(drone):
     global state
     global lastPacketTime
     global health
+    global connected
 
     async for state in drone.core.connection_state():
         lastPacketTime = time.time()
@@ -42,7 +43,6 @@ async def setup(drone):
             printPxh(f"-- Connected int port: {portIn}")
             connected = True
             break
-
     printPxh("Waiting for drone to have a global position estimate...")
 
 
