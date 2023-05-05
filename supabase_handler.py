@@ -17,6 +17,11 @@ supabase: Client = create_client(supabase_url, supabase_key)
 current_id = -111
 stop_drone = False
 
+drone_table = 'drone_data'
+traject_type = 'traject_type'
+traject = 'traject'
+is_stopped = 'is_stopped'
+
 drone = System()
 
 
@@ -30,10 +35,9 @@ async def run_drone():
     stop_drone = response['data'][0]['is_stopped']
     print(stop_drone)
     while float(await get_battery(drone)) > 0.1 and not stop_drone:
-        response = json.loads(supabase.table('drone_data').select(
-            'id', 'traject_type', 'is_stopped', 'traject').execute().json())
+        response = json.loads(supabase.table(drone_table).select(
+            'id', traject_type, is_stopped, traject).execute().json())
         data = response['data'][0]
-        print(data)
         id = data['id']
         global current_id
         global typeTrajet
