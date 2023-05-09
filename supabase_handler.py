@@ -3,39 +3,47 @@ import json
 from supabase import create_client, Client
 from mavsdk import System
 from drone_actions import get_battery, get_postion, return_to_home, goto_coordonnates_close, go_to_coordinates_open
+import os
+from dotenv import load_dotenv
 
 
-url: str = "http://localhost:8000"
-key: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICAgInJvbGUiOiAiYW5vbiIsCiAgICAiaXNzIjogInN1cGFiYXNlIiwKICAgICJpYXQiOiAxNjgzMDY0ODAwLAogICAgImV4cCI6IDE4NDA5MTc2MDAKfQ.DmHNWaOzGrlmi5gDellrcCFP1fi2c_1RpY9HzaXcbNI"
+load_dotenv()
+supabase_url: str = os.environ.get('SUPABASE_URL')
+supabase_key: str = os.environ.get('SUPABASE_KEY')
 
-supabase: Client = create_client(url, key)
+supabase: Client = create_client(supabase_url, supabase_key)
 
 
-# supabase.table('drone').select('id, typeTrajet , trajet->coordinates{longitude,altitude,longitude}, stop').execute()
-
-curent_id = -111
+current_id = -111
 stop_drone = False
+
+drone_table = 'drone_data'
+traject_type = 'traject_type'
+traject = 'traject'
+is_stopped = 'is_stopped'
 
 drone = System()
 
 
 async def run_drone():
+    """
+    Runs the drone.
+    """
     global stop_drone
     response = json.loads(supabase.table(
         'drone_data').select('is_stopped').execute().json())
     stop_drone = response['data'][0]['is_stopped']
     print(stop_drone)
     while float(await get_battery(drone)) > 0.1 and not stop_drone:
-        response = json.loads(supabase.table('drone_data').select(
-            'id', 'traject_type', 'is_stopped', 'traject').execute().json())
+        response = json.loads(supabase.table(drone_table).select(
+            'id', traject_type, is_stopped, traject).execute().json())
         data = response['data'][0]
-        print(data)
         id = data['id']
-        global curent_id
+        global current_id
         global typeTrajet
         global coordinates
-        if id != curent_id:
-            curent_id = id
+        if id != current_id:
+            current_id = id
             typeTrajet = data['traject_type']
             coordinates = data['traject']
         stop_drone = data['is_stopped']
@@ -43,7 +51,19 @@ async def run_drone():
             await goto_coordonnates_close(drone, coordinates)
         else:
             await go_to_coordinates_open(drone, coordinates)
+        await update_position(current_id)
     await return_to_home(drone)
+
+
+async def update_position(current_id):
+    """
+    Updates the position of the drone in the database.
+    """
+    position = await get_postion(drone)
+    latitude = float(position.latitude_deg)
+    longitude = float(position.longitude_deg)
+    data, count = supabase.table('drone_data').update({'position': {
+        'latitude': latitude, 'longitude': longitude}}).eq('id', current_id).execute()
 
 
 if __name__ == '__main__':
