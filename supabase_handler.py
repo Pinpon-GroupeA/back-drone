@@ -5,12 +5,15 @@ from mavsdk import System
 from drone_actions import get_battery, get_postion, return_to_home, goto_coordonnates_close, go_to_coordinates_open
 import os
 from dotenv import load_dotenv
+from utils import get_image
 
 
 load_dotenv()
-
 supabase_url: str = os.environ.get('SUPABASE_URL')
 supabase_key: str = os.environ.get('SUPABASE_KEY')
+mapbox_key: str = os.environ.get('MAPBOX_ACCESS_TOKEN')
+
+
 supabase: Client = create_client(supabase_url, supabase_key)
 
 
@@ -21,11 +24,15 @@ drone_table = 'drone_data'
 traject_type = 'traject_type'
 traject = 'traject'
 is_stopped = 'is_stopped'
+coordinates = []
 
 drone = System()
 
 
 async def run_drone():
+    """
+    Runs the drone.
+    """
     """
     Runs the drone.
     """
@@ -42,8 +49,8 @@ async def run_drone():
         global current_id
         global typeTrajet
         global coordinates
-        if id != current_id:
-            current_id = id
+        if id != currrent_id:
+            currrent_id = id
             typeTrajet = data['traject_type']
             coordinates = data['traject']
         stop_drone = data['is_stopped']
@@ -84,4 +91,4 @@ async def update_position(current_id):
 
 
 if __name__ == '__main__':
-    asyncio.run(run_drone())
+    asyncio.run(get_image(-1.638537, 48.115008, 13, mapbox_key))
