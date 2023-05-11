@@ -84,4 +84,4 @@ async def update_position(current_id):
 
 
 if __name__ == '__main__':
-    asyncio.run(save_photo())
+    asyncio.run(run_drone())
