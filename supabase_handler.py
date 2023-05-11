@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 
 
 load_dotenv()
+
 supabase_url: str = os.environ.get('SUPABASE_URL')
 supabase_key: str = os.environ.get('SUPABASE_KEY')
-
 supabase: Client = create_client(supabase_url, supabase_key)
 
 
@@ -53,6 +53,23 @@ async def run_drone():
             await go_to_coordinates_open(drone, coordinates)
         await update_position(current_id)
     await return_to_home(drone)
+
+
+async def save_photo(file):
+    """Save in the supabase bucket named images, we fill the name of the subsequent folders in the path of the image"""
+    # file = "assets/deusvult.png"
+    with open(file, "rb") as f:
+        supabase.storage().from_("images").upload(
+            "interventions/123456/bite.png", f)
+
+
+async def save_video(filePosition):
+    """Delete the file at the path filePosition in the supabase bucket named images  and replace it with the new file.
+    We fill the name of the subsequent folders in the path of the image"""
+    file = "assets/deusvult.png"
+    with open(file, "rb") as file:
+        supabase.storage().from_("images").remove(filePosition)
+        supabase.storage().from_("images").upload(filePosition, file)
 
 
 async def update_position(current_id):
