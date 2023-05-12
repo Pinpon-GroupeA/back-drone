@@ -27,7 +27,7 @@ def is_in_coordinates(current_latitude, current_longitude, coordinates):
         long = round(coordinate['longitude'], 6)
         if isclose(long, round(current_longitude, 6), abs_tol=0.0002) and isclose(lat, float(current_latitude), abs_tol=0.0002):
             print("is in coordinates")
-            return (True, lat, long)
+            return (True, coordinate['latitude'], coordinate['longitude'])
     return (False, 0, 0)
 
 

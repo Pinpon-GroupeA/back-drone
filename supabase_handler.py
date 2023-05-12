@@ -52,16 +52,18 @@ async def run_drone():
             typeTrajet = data['traject_type']
             coordinates = data['traject']
             stop_drone = data['is_stopped']
-            if typeTrajet == 'CLOSED_CIRCUIT':
-                await goto_coordonnates_close(drone, coordinates)
-            else:
-                await go_to_coordinates_open(drone, coordinates)
-            await update_position(current_intervention_id)
-        await return_to_home(drone)
+            if coordinates != []:
+                if typeTrajet == 'CLOSED_CIRCUIT':
+                    await goto_coordonnates_close(drone, coordinates)
+                else:
+                    await go_to_coordinates_open(drone, coordinates)
+                await update_position(current_intervention_id)
+    await return_to_home(drone)
 
 
 async def save_photo(path_to_save, file):
     """Save in the supabase bucket named images, we fill the name of the subsequent folders in the path of the image"""
+    # file = "assets/deusvult.png"
     global current_intervention_id
     with open(file, "rb") as f:
         supabase.storage().from_("photo").upload(
