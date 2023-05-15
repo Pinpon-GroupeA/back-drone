@@ -39,11 +39,10 @@ async def run_drone():
         'drone_data').select('is_stopped').execute().json())
     stop_drone = response['data'][0]['is_stopped']
     print(stop_drone)
-    while float(await get_battery(drone)) > 0.1 and not stop_drone:
+    while float(await get_battery(drone)) > 0.1:
         response = json.loads(supabase.table(drone_table).select(
             'id', traject_type, is_stopped, traject, 'intervention_id').execute().json())
         data = response['data'][0]
-        # id = data['id']
         global current_intervention_id
         global typeTrajet
         global coordinates
@@ -52,18 +51,18 @@ async def run_drone():
             typeTrajet = data['traject_type']
             coordinates = data['traject']
             stop_drone = data['is_stopped']
-            if coordinates != []:
+            if coordinates != [] and coordinates != None and not is_stopped:
                 if typeTrajet == 'CLOSED_CIRCUIT':
                     await goto_coordonnates_close(drone, coordinates)
                 else:
                     await go_to_coordinates_open(drone, coordinates)
                 await update_position(current_intervention_id)
-    await return_to_home(drone)
+            if stop_drone:
+                await return_to_home(drone)
 
 
 async def save_photo(path_to_save, file):
     """Save in the supabase bucket named images, we fill the name of the subsequent folders in the path of the image"""
-    # file = "assets/deusvult.png"
     global current_intervention_id
     with open(file, "rb") as f:
         supabase.storage().from_("photo").upload(
