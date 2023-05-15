@@ -1,5 +1,6 @@
 import asyncio
 import json
+import time
 from supabase import create_client, Client
 from mavsdk import System
 from drone_actions import get_battery, get_postion, return_to_home, goto_coordonnates_close, go_to_coordinates_open
@@ -51,7 +52,7 @@ async def run_drone():
             typeTrajet = data['traject_type']
             coordinates = data['traject']
             stop_drone = data['is_stopped']
-            if coordinates != [] and coordinates != None and not is_stopped:
+            if coordinates != [] and coordinates != None and not stop_drone:
                 if typeTrajet == 'CLOSED_CIRCUIT':
                     await goto_coordonnates_close(drone, coordinates)
                 else:
@@ -100,6 +101,7 @@ async def update_position(current_intervention_id):
     name_vido = "photo.png"
     await get_image(f"video/{name_vido}", longitude=longitude, latitude=latitude, zoom=19, token=mapbox_key)
     await save_video(f"intervention_{current_intervention_id}/{name_vido}")
+    time.sleep(3)
 
 
 if __name__ == '__main__':
