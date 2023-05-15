@@ -13,8 +13,8 @@
 5. In a terminal
     * go to PX4-Autopilot folder
     * run this for init the simulation at ISITC location: 
-        `export PX4_HOME_LON=-1.638537
-        export PX4_HOME_LAT=48.115008`
+        `export PX4_HOME_LON=-1.638537`
+        `export PX4_HOME_LAT=48.115008`
 
 6. Run `make px4_sitl jmavsim` (only work with java 11)
 
