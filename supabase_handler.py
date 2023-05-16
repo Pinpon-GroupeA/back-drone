@@ -57,9 +57,10 @@ async def run_drone():
                     await goto_coordonnates_close(drone, coordinates)
                 else:
                     await go_to_coordinates_open(drone, coordinates)
-                await update_position(current_intervention_id)
+
             if stop_drone:
                 await return_to_home(drone)
+            await update_position(current_intervention_id)
 
 
 async def save_photo(path_to_save, file):
@@ -101,7 +102,7 @@ async def update_position(current_intervention_id):
     name_vido = "photo.png"
     await get_image(f"video/{name_vido}", longitude=longitude, latitude=latitude, zoom=19, token=mapbox_key)
     await save_video(f"intervention_{current_intervention_id}/{name_vido}")
-    time.sleep(3)
+    time.sleep(1)
 
 
 if __name__ == '__main__':
