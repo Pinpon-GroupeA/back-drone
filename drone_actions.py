@@ -165,6 +165,8 @@ async def return_to_home(drone):
     """
     printPxh("-- Returning to home")
     await drone.action.return_to_launch()
+    global finish
+    finish = True
     printPxh("-- arrived at home")
 
 
